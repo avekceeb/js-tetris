@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="description" content="800, 640" />
+        <title>::TETRIS::</title>
+        <script type="text/javascript" src="tetris.js"></script>
+
+        <style type="text/css">
+            * { font-family: Tahoma, Arial, Helvetica, sans-serif; }
+			div#message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                font-size: 50px;
+                width: 400px;
+                background-color: white;
+                border: 2px solid black;
+                margin-left: -200px;
+                display: none;
+			}
+            #message a {
+                text-decoration:none;
+                color: red;
+            }
+            div#container {
+                margin: 50px 0px 0px 0px;
+            }
+            .m {
+                background-color: #c0c0d0 ;
+            }
+            .n {
+                background-color: #c0D0d0 ;
+            }
+            .v {
+                background-color: #E0D0C0 ;
+            }
+            .x {
+                background-color: #D0F0D0 ;
+            }
+			body {
+                background-color: white; 
+			}
+            div.square {
+				border-top-width: 0px;
+				border-right-width: 1px;
+				border-bottom-width: 1px;
+				border-left-width: 0px;
+				border-color: black;
+				border-style: solid;
+				width: 20px;
+                height: 20px;
+            }
+            div.square-next {
+				border: none 0;
+                width: 10px;
+                height: 10px;
+            }
+            div.back {
+                background: none white no-repeat 0 0;
+            }
+            div.fore {
+                background: none gray no-repeat 0 0;
+            }
+            div.c {
+                background: none magenta no-repeat 0 0;
+            }
+            div.d {
+                background: none red no-repeat 0 0;
+            }
+            div.e {
+                background: none green no-repeat 0 0;
+            }
+            div.f {
+                background: none blue no-repeat 0 0;
+            }
+            div.g {
+                background: none orange no-repeat 0 0;
+            }
+            div.h {
+                background: none cyan no-repeat 0 0;
+            }
+			table#main-table {
+				border-top-width: 1px;
+				border-right-width: 0px;
+				border-bottom-width: 0px;
+				border-left-width: 1px;
+				border-color: black;
+				border-style: solid;
+			}
+			table#score-table td {
+				padding: 5px 5px 5px 10px;
+			}
+            #level-cell {
+                font-size: 50px;
+                font-weight: bold;
+            }
+			table#next-table td {
+                border: none 0;
+				padding: 0;
+			}
+            p.help {
+                font-size: x-small;
+                margin: 0px 0px 5px 0px;
+                padding: 0;
+            }
+        </style>
+    </head>
+
+    <body onload="javascript:init_game()"  onkeydown="javascript:process_key(event)" onkeypress="javascript:process_key(event)">
+        <div align="center" id='container'>
+            <table cellpadding="0" cellspacing="0">
+			<tbody><tr><td>
+            <table cellpadding="0" cellspacing="0" id="main-table">
+            </table>
+			</td><td>
+			<table cellpadding="0" cellspacing="0" id="score-table">
+			<tbody>
+			<tr><td colspan="2" align="center">
+			
+			<div>
+		    <div>
+                <p class='help'>Enter - start</p>
+                <p class='help'>Esc - pause</p>
+                <p class='help'>Space - down</p>
+                <p class='help'>Up Arrow - rotate</p>
+                <p class='help'>Arrows - right | left</p>
+                <p >Next Figure:</p>
+            </div>	
+			<table cellpadding="0" cellspacing="0" id="next-table" ></table>
+			
+			</div>
+			</td></tr>
+			<tr><td>Level</td><td id="level-cell">0</td></tr>
+			<tr><td>Points</td><td id="points-cell">0</td></tr>
+			<tr><td>Next Level</td><td id="next-cell">0</td></tr>
+			<tr><td>Lines</td><td id="lines-cell">0</td></tr>
+			<tr><td>Pieces</td><td id="pieces-cell">0</td></tr>
+			</tbody>
+			</table>
+			</td></tr></tbody></table>
+
+    <div id='message'><a href="#" target="_blank" onclick="init_game();return false" id='messagetext'>START</a></div>
+
+			</div>
+    </body>
+</html>
