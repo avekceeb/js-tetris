@@ -115,12 +115,22 @@ function setStyle(selector, property, value) {
 //////// UI class  ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-function TetrisCssUI() {
+function TetrisCssUI(html_root_element) {
 
     h = getPageSize()[1];
     ch = Math.floor((h-70)/21);
     setStyle('div.square', 'width', ch + 'px');
     setStyle('div.square', 'height', ch + 'px');
+
+    var root = document.getElementById(html_root_element);
+    var main_table = document.createElement('table');
+    var tr = document.createElement('tr');
+    var td_left = document.createElement('td');
+    var td_right = document.createElement('td');
+    tr.appendChild(td_right);
+    tr.appendChild(td_left);
+    main_table.appendChild(tr);
+    root.appendChild(main_table);
 
     this.field_rows = [];
     this.board_rows = [];
@@ -291,7 +301,7 @@ function Figure (game_, id) {
 //////////////////////////////////////////////////////////////////////
 ////////  Game class  ////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-function TetrisGame(ui, w, h) {
+function TetrisGame(html_root_element, w, h, ui) {
 
     function get_bonus_points(lines) {
         switch (lines) {
@@ -303,7 +313,6 @@ function TetrisGame(ui, w, h) {
             default: return 0;
         }
     }
-
     this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
     //this.levels = [1, 2, 3];
     this.timer = null;
@@ -332,8 +341,8 @@ function TetrisGame(ui, w, h) {
     this.resume = function() {
         this.running = true;
         this.timer = setTimeout(function() { Tetris.run() }, this.timeout);
-        //this.figure.move_down();
-        //this.redraw_ui();
+        this.figure.move_down();
+        this.redraw_ui();
     }
     /*************/
 
@@ -467,7 +476,7 @@ function TetrisGame(ui, w, h) {
             default: break;
         }
     };
-    this.UI = new ui();
+    this.UI = new ui(html_root_element);
     this.figure = new Figure(this, 0);
     this.UI.create_field(this.field, this.figure);
     this.UI.create_board(this.score);
@@ -496,13 +505,7 @@ function process_key(e) {
 	return true;
 }
 
-function close_dialog() {
-    var d = document.getElementById("message");
-    d.style.display = 'none';
-    return false;
-}
-
-function init_game() {
-    Tetris = new TetrisGame(TetrisCssUI);
+function init_game(root_element) {
+    Tetris = new TetrisGame(root_element, 8, 20, TetrisCssUI);
     Tetris.run();
 }

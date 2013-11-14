@@ -1,4 +1,4 @@
 js-tetris
 =========
 
-Tetris Game on javascript
+Tetris Game in javascript
