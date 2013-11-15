@@ -18,6 +18,7 @@
 var Tetris;
 var Styles = ["square back","square c","square d","square e","square f","square g","square h"];
 var BodyStyles = ['m','n','v','x'];
+var Css = { 'table#tblField' : 'border-top-width: 1px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 1px; border-color: black; border-style: solid;' };
 //////////////////////////////////////////////////////////////////////
 // TODO: hide into Game class
 var L0 = [
@@ -121,12 +122,24 @@ function TetrisCssUI(html_root_element) {
     ch = Math.floor((h-70)/21);
     setStyle('div.square', 'width', ch + 'px');
     setStyle('div.square', 'height', ch + 'px');
+    document.styleSheets[0].insertRule('table#tblField{' + Css['table#tblField'] + '}', 0);
 
     var root = document.getElementById(html_root_element);
     var main_table = document.createElement('table');
     var tr = document.createElement('tr');
     var td_left = document.createElement('td');
     var td_right = document.createElement('td');
+    var tblField = document.createElement('table');
+    tblField.setAttribute('cellpadding', '0');
+    tblField.setAttribute('cellspacing', '0');
+    tblField.setAttribute('id', 'tblField');
+    var tblBoard = document.createElement('table');
+    tblBoard.setAttribute('cellpadding', '0');
+    tblBoard.setAttribute('cellspacing', '0');
+    tblBoard.setAttribute('id', 'tblBoard');
+    
+    td_left.appendChild(tblField);
+    td_right.appendChild(tblBoard);
     tr.appendChild(td_right);
     tr.appendChild(td_left);
     main_table.appendChild(tr);
@@ -138,7 +151,7 @@ function TetrisCssUI(html_root_element) {
     document.getElementById("message").style.display = 'none';
 
     this.create_field = function(M, F) {
-        var l = document.getElementById("main-table");
+        var l = tblField;
         while (l.firstChild)  l.removeChild(l.firstChild);
         for(var row=0; row<M.length-1; row++) {
             var r = document.createElement("tr");
@@ -155,10 +168,11 @@ function TetrisCssUI(html_root_element) {
     };
 
     this.create_board = function(score) {
-        var l = document.getElementById("next-table");
+        var l = tblBoard;
         while (l.firstChild)  l.removeChild(l.firstChild);
         for(var row=0; row<4; row++) {
             var r = document.createElement("tr");
+            //TODO change 4 to max figure size
             for (var cell=0; cell<4; cell++) {
                 var td = document.createElement("td");
                 var d = document.createElement("div");
@@ -185,17 +199,6 @@ function TetrisCssUI(html_root_element) {
     }
 
     this.update_score = function(score) {
-        // TODO: save elements as class fields
-        var pnt = document.getElementById("points-cell");
-        var lvl = document.getElementById("level-cell");
-        var l = document.getElementById("lines-cell");
-        var p = document.getElementById("pieces-cell");
-        var nxt = document.getElementById("next-cell");
-        pnt.innerHTML = score['Points'].toString();
-        lvl.innerHTML = score['Level'].toString();
-        l.innerHTML = score['Lines'].toString();
-        p.innerHTML = score['Pieces'].toString();
-        nxt.innerHTML = score['Next'].toString();
     }
 
     this.draw_next_figure = function(fig_id) {
