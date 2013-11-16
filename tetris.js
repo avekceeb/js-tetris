@@ -18,7 +18,36 @@
 var Tetris;
 var Styles = ["square back","square c","square d","square e","square f","square g","square h"];
 var BodyStyles = ['m','n','v','x'];
-var Css = { 'table#tblField' : 'border-top-width: 1px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 1px; border-color: black; border-style: solid;' };
+var Css = { 
+'table#tblTetris' :
+    'font-family: monospace, sans-serif; background: lightcyan 0 ; font-size: x-small;',
+'table#tblField' :
+    'border-top-width: 1px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 1px; border-color: black; border-style: solid;', 
+'ul#ulLevels':
+    'list-style: none; padding-left: 0;',
+'table#next-table' :
+    'border: 0 none; padding: 0; background: transparent 0 ;',
+'table#next-table td' :
+    'border: 0 none; padding: 0;',
+'div.square-next':
+    'border: none 0; width: 10px; height: 10px;',
+'div.square-next-fore':
+    'background-color: gray;',
+'div.square-next-back':
+    'background-color: transparent;',
+'div.c' :
+    'background: none magenta no-repeat 0 0;',
+'div.d' :
+    'background: none red no-repeat 0 0;',
+'div.e' :
+    'background: none green no-repeat 0 0;',
+'div.f' :
+    'background: none blue no-repeat 0 0;',
+'div.g' :
+    'background: none orange no-repeat 0 0;',
+'div.h' :
+    'background: none cyan no-repeat 0 0;'
+};
 //////////////////////////////////////////////////////////////////////
 // TODO: hide into Game class
 var L0 = [
@@ -122,10 +151,13 @@ function TetrisCssUI(html_root_element) {
     ch = Math.floor((h-70)/21);
     setStyle('div.square', 'width', ch + 'px');
     setStyle('div.square', 'height', ch + 'px');
-    document.styleSheets[0].insertRule('table#tblField{' + Css['table#tblField'] + '}', 0);
-
+    //document.styleSheets[0].insertRule('table#tblField{' + Css['table#tblField'] + '}', 0);
+    
+    for (var selector in Css) {
+        document.styleSheets[0].insertRule(selector + '{' + Css[selector] + '}', 0);
+    }
     var root = document.getElementById(html_root_element);
-    var main_table = document.createElement('table');
+    var tblTetris = document.createElement('table');
     var tr = document.createElement('tr');
     var td_left = document.createElement('td');
     var td_right = document.createElement('td');
@@ -134,16 +166,20 @@ function TetrisCssUI(html_root_element) {
     tblField.setAttribute('cellspacing', '0');
     tblField.setAttribute('id', 'tblField');
     var tblBoard = document.createElement('table');
+    tblTetris.setAttribute('id', 'tblTetris');
     tblBoard.setAttribute('cellpadding', '0');
     tblBoard.setAttribute('cellspacing', '0');
     tblBoard.setAttribute('id', 'tblBoard');
-    
+    var ulLevels = document.createElement('ul');
+    ulLevels.setAttribute('id', 'ulLevels');
+
     td_left.appendChild(tblField);
     td_right.appendChild(tblBoard);
+    td_right.appendChild(ulLevels);
     tr.appendChild(td_right);
     tr.appendChild(td_left);
-    main_table.appendChild(tr);
-    root.appendChild(main_table);
+    tblTetris.appendChild(tr);
+    root.appendChild(tblTetris);
 
     this.field_rows = [];
     this.board_rows = [];
@@ -183,6 +219,12 @@ function TetrisCssUI(html_root_element) {
             l.appendChild(r);
         }
         // TODO create score table by args
+        var lvls = score['AllLevels'];
+        for(var i=lvls.length-1; i>=0; i--) {
+            var li = document.createElement('li');
+            li.innerHTML = i + ": " + lvls[i];
+            ulLevels.appendChild(li);
+        }
         this.board_rows = l.getElementsByTagName("tr");
     };
 
@@ -208,15 +250,13 @@ function TetrisCssUI(html_root_element) {
                 var c = this.board_rows[row].cells[cell];
                 var d = c.getElementsByTagName("div");
                 style = ((row<f.length) && (cell<f[row].length)) ? f[row][cell] : 0; 
-                d[0].setAttribute("class", style ? "square-next fore" : "square-next back");
+                d[0].setAttribute("class", style ? "square-next square-next-fore" : "square-next square-next-back");
             }
         }
     }
 
     this.change_page_style = function() {
         //TODO: 
-        document.getElementsByTagName('body')[0].setAttribute('class', 
-            BodyStyles[Math.floor(Math.random()*BodyStyles.length)]);
     }
 
     this.redraw = function(M, F, score, next) {
@@ -321,7 +361,7 @@ function TetrisGame(html_root_element, w, h, ui) {
     this.timer = null;
     this.timeout = 1200;
     this.running = false;
-    this.score = {'Lines':0,'Pieces':0,'Points':0,'Level':0,'Next':this.levels.shift()};
+    this.score = {'Lines':0,'Pieces':0,'Points':0,'Level':0,'Next':this.levels.shift(), 'AllLevels':this.levels};
     this.width = w || 10;
     this.height = h || 20;
     this.next_figure_id = Math.floor(Math.random()*P.length);
@@ -485,6 +525,7 @@ function TetrisGame(html_root_element, w, h, ui) {
     this.UI.create_board(this.score);
     this.UI.update_score(this.score);
     this.UI.draw_figure(this.field, this.figure);
+    this.UI.draw_next_figure(this.next_figure_id);
 }
 //////////////////////////////////////////////////////////////////////
 

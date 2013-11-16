@@ -7,7 +7,6 @@
         <script type="text/javascript" src="tetris.js"></script>
 
         <style type="text/css">
-            * { font-family: Tahoma, Arial, Helvetica, sans-serif; }
 			div#message {
                 position: absolute;
                 top: 50%;
@@ -22,9 +21,6 @@
             #message a {
                 text-decoration:none;
                 color: red;
-            }
-            div#container {
-                margin: 50px 0px 0px 0px;
             }
             .m {
                 background-color: #c0c0d0 ;
@@ -51,50 +47,12 @@
 				width: 20px;
                 height: 20px;
             }
-            div.square-next {
-				border: none 0;
-                width: 10px;
-                height: 10px;
-            }
-            div.back {
-                background: none white no-repeat 0 0;
-            }
-            div.fore {
-                background: none gray no-repeat 0 0;
-            }
-            div.c {
-                background: none magenta no-repeat 0 0;
-            }
-            div.d {
-                background: none red no-repeat 0 0;
-            }
-            div.e {
-                background: none green no-repeat 0 0;
-            }
-            div.f {
-                background: none blue no-repeat 0 0;
-            }
-            div.g {
-                background: none orange no-repeat 0 0;
-            }
-            div.h {
-                background: none cyan no-repeat 0 0;
-            }
 			table#score-table td {
 				padding: 5px 5px 5px 10px;
 			}
             #level-cell {
                 font-size: 50px;
                 font-weight: bold;
-            }
-			table#next-table td {
-                border: none 0;
-				padding: 0;
-			}
-            p.help {
-                font-size: x-small;
-                margin: 0px 0px 5px 0px;
-                padding: 0;
             }
         </style>
     </head>
@@ -103,7 +61,6 @@
         <div align="center" id='container'>
     				<div id='message'><a href="#" target="_blank" onclick="init_game();return false" id='messagetext'>START</a></div>
 			<div id='js-tetris-root'></div>
-			
 			</div>
     </body>
 </html>
