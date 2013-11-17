@@ -2,7 +2,7 @@
 //    [*,0,0],
 //    [1,0,0],
 //    [1,1,0]
-//  ]; 
+//  ];
 //       * - is coordinate of the figure
 //       0 - means that field is empty
 //       >0 - means occupied field
@@ -20,11 +20,17 @@ var Styles = ["square back","square c","square d","square e","square f","square 
 var BodyStyles = ['m','n','v','x'];
 var Css = { 
 'table#tblTetris' :
-    'font-family: monospace, sans-serif; background: lightcyan 0 ; font-size: x-small;',
+    'font-family: monospace, sans-serif; background: beige 0 ; font-size: small;',
 'table#tblField' :
     'border-top-width: 1px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 1px; border-color: black; border-style: solid;', 
 'ul#ulLevels':
     'list-style: none; padding-left: 0;',
+'li.current':
+    'background:gainsboro;',
+'li.done' :
+    'text-decoration: line-through;',
+'ul#ulScore' :
+    'list-style: none; padding-left:0;',
 'table#next-table' :
     'border: 0 none; padding: 0; background: transparent 0 ;',
 'table#next-table td' :
@@ -36,17 +42,19 @@ var Css = {
 'div.square-next-back':
     'background-color: transparent;',
 'div.c' :
-    'background: none magenta no-repeat 0 0;',
+    'background: none mediumvioletred no-repeat 0 0;',
 'div.d' :
-    'background: none red no-repeat 0 0;',
+    'background: none maroon no-repeat 0 0;',
 'div.e' :
-    'background: none green no-repeat 0 0;',
+    'background: none darkolivegreen no-repeat 0 0;',
 'div.f' :
-    'background: none blue no-repeat 0 0;',
+    'background: none midnightblue no-repeat 0 0;',
 'div.g' :
-    'background: none orange no-repeat 0 0;',
+    'background: none darkorange no-repeat 0 0;',
 'div.h' :
-    'background: none cyan no-repeat 0 0;'
+    'background: none indigo no-repeat 0 0;',
+'div.square' :
+    'border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 0px; border-color: black; border-style: solid; width: 20px; height: 20px;',
 };
 //////////////////////////////////////////////////////////////////////
 // TODO: hide into Game class
@@ -138,7 +146,7 @@ function setStyle(selector, property, value) {
     for (var i=0; i<rules.length; i++) {
         if (selector ==  rules[i].selectorText) {
                 rules[i].style[property] = value;
-        }        
+        }
     }
 }
 //////////////////////////////////////////////////////////////////////
@@ -146,17 +154,18 @@ function setStyle(selector, property, value) {
 //////////////////////////////////////////////////////////////////////
 
 function TetrisCssUI(html_root_element) {
-
+    // TODO: sizes of root element
     h = getPageSize()[1];
     ch = Math.floor((h-70)/21);
-    setStyle('div.square', 'width', ch + 'px');
-    setStyle('div.square', 'height', ch + 'px');
-    //document.styleSheets[0].insertRule('table#tblField{' + Css['table#tblField'] + '}', 0);
-    
+
     for (var selector in Css) {
         document.styleSheets[0].insertRule(selector + '{' + Css[selector] + '}', 0);
     }
+    setStyle('div.square', 'width', ch + 'px');
+    setStyle('div.square', 'height', ch + 'px');
+    this.levelRows = [];
     var root = document.getElementById(html_root_element);
+    root.innerHTML='';
     var tblTetris = document.createElement('table');
     var tr = document.createElement('tr');
     var td_left = document.createElement('td');
@@ -172,10 +181,15 @@ function TetrisCssUI(html_root_element) {
     tblBoard.setAttribute('id', 'tblBoard');
     var ulLevels = document.createElement('ul');
     ulLevels.setAttribute('id', 'ulLevels');
+    var ulScore = document.createElement('ul');
+    ulScore.setAttribute('id', 'ulScore');
+    var liPoints = document.createElement('li');
+    ulScore.appendChild(liPoints);
 
     td_left.appendChild(tblField);
     td_right.appendChild(tblBoard);
     td_right.appendChild(ulLevels);
+    td_right.appendChild(ulScore);
     tr.appendChild(td_right);
     tr.appendChild(td_left);
     tblTetris.appendChild(tr);
@@ -218,14 +232,17 @@ function TetrisCssUI(html_root_element) {
             }
             l.appendChild(r);
         }
-        // TODO create score table by args
+        allLevels = score['AllLevels'];
         var lvls = score['AllLevels'];
-        for(var i=lvls.length-1; i>=0; i--) {
+        for (var i=lvls.length-1; i>=0; i--) {
             var li = document.createElement('li');
+            //li.setAttribute('class', 'current done');
             li.innerHTML = i + ": " + lvls[i];
             ulLevels.appendChild(li);
+            this.levelRows.push(li);
         }
         this.board_rows = l.getElementsByTagName("tr");
+        liPoints.innerHTML = "P: " + score['Points'];
     };
 
     this.draw_figure = function (M, F) {
@@ -241,6 +258,11 @@ function TetrisCssUI(html_root_element) {
     }
 
     this.update_score = function(score) {
+        var lvls = score['AllLevels'];
+        for (var i=this.levelRows.length-1; i>lvls.length; i--) {
+            this.levelRows[i].setAttribute('class', 'done');
+        }
+        liPoints.innerHTML = "P: " + score['Points'];
     }
 
     this.draw_next_figure = function(fig_id) {
@@ -255,10 +277,6 @@ function TetrisCssUI(html_root_element) {
         }
     }
 
-    this.change_page_style = function() {
-        //TODO: 
-    }
-
     this.redraw = function(M, F, score, next) {
         for(var row=0; row<M.length-1; row++) {
             for (var cell=0; cell<M[0].length-1; cell++) {
@@ -268,7 +286,6 @@ function TetrisCssUI(html_root_element) {
             }
         }
         this.draw_figure(M, F);
-        this.update_score(score);
         this.draw_next_figure(next);
     };
 
@@ -347,6 +364,7 @@ function Figure (game_, id) {
 function TetrisGame(html_root_element, w, h, ui) {
 
     function get_bonus_points(lines) {
+        return lines;
         switch (lines) {
             case 0: return 0;
             case 1: return 1;
@@ -356,8 +374,8 @@ function TetrisGame(html_root_element, w, h, ui) {
             default: return 0;
         }
     }
-    this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
-    //this.levels = [1, 2, 3];
+    //this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
+    this.levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10];
     this.timer = null;
     this.timeout = 1200;
     this.running = false;
@@ -426,7 +444,6 @@ function TetrisGame(html_root_element, w, h, ui) {
             this.shift_lines(l);
         }
         // New level calculations:
-        l = 0;
         while(this.score['Points'] >= this.score['Next']) {
             if (0 >= this.levels.length) {
                 this.pause();
@@ -434,12 +451,9 @@ function TetrisGame(html_root_element, w, h, ui) {
                 return;
             }
             this.score['Next'] = this.levels.shift();
-		    this.score['Level']++;
+            this.score['Level']++;
             this.timeout *= 0.85;
-            l = 1;
-        }
-        if (l>0) {
-            this.UI.change_page_style();
+            this.UI.update_score(this.score);
         }
     }
 
@@ -520,10 +534,10 @@ function TetrisGame(html_root_element, w, h, ui) {
         }
     };
     this.UI = new ui(html_root_element);
-    this.figure = new Figure(this, 0);
+    this.figure = new Figure(this, Math.floor(Math.random()*P.length));
     this.UI.create_field(this.field, this.figure);
     this.UI.create_board(this.score);
-    this.UI.update_score(this.score);
+    //this.UI.update_score(this.score);
     this.UI.draw_figure(this.field, this.figure);
     this.UI.draw_next_figure(this.next_figure_id);
 }
@@ -540,13 +554,13 @@ function process_key(e) {
         return ((32==k) || (27==k) || (37==k) || (39==k)|| (40==k) || (38==k) || (13==k));
     }
     //var Running = true;
-	var e = window.event || e ;
-	var Skip = (("keypress"== e.type) && ("keypress" != PrevEvent));
+    var e = window.event || e ;
+    var Skip = (("keypress"== e.type) && ("keypress" != PrevEvent));
     if (is_special(e.keyCode) && (!Skip)) {
         Tetris.user_action(e.keyCode);
     }
-	PrevEvent=e.type;
-	return true;
+    PrevEvent=e.type;
+    return true;
 }
 
 function init_game(root_element) {
