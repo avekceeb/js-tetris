@@ -16,45 +16,58 @@
 
 //////////////////////////////////////////////////////////////////////
 var Tetris;
-var Styles = ["square back","square c","square d","square e","square f","square g","square h"];
-var BodyStyles = ['m','n','v','x'];
+var Styles = ["square back","square c","square d","square e","square f","square g","square h","square c","square d","square e","square f","square g","square h","square c","square d","square e","square f","square g","square h"];
+var HelpMessages = [
+    'Enter - start',
+    'Esc   - pause',
+    'Up  -  rotate',
+    'Space - drop'
+];
 var Css = { 
 'table#tblTetris' :
-    'font-family: monospace, sans-serif; background: beige 0 ; font-size: small;',
+    'font-family: monospace,sans-serif; background:beige 0 ; font-size:small;',
 'table#tblField' :
-    'border-top-width: 1px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 1px; border-color: black; border-style: solid;', 
+    'border-top-width:1px; border-right-width:0px; border-bottom-width:0px; border-left-width:1px; border-color:black; border-style:solid;', 
 'ul#ulLevels':
-    'list-style: none; padding-left: 0;',
+    'list-style:none; padding-left:0;',
 'li.current':
     'background:gainsboro;',
 'li.done' :
-    'text-decoration: line-through;',
+    'text-decoration:line-through;',
 'ul#ulScore' :
     'list-style: none; padding-left:0;',
+'ul#ulHelp' :
+    'list-style:none; padding-left:0; font-size:x-small;',
 'table#next-table' :
-    'border: 0 none; padding: 0; background: transparent 0 ;',
+    'border:0 none; padding:0; background:transparent 0 ;',
 'table#next-table td' :
-    'border: 0 none; padding: 0;',
+    'border:0 none; padding:0;',
 'div.square-next':
-    'border: none 0; width: 10px; height: 10px;',
+    'border:none 0; width:10px; height:10px;',
 'div.square-next-fore':
-    'background-color: gray;',
+    'background-color:gray;',
 'div.square-next-back':
     'background-color: transparent;',
 'div.c' :
-    'background: none mediumvioletred no-repeat 0 0;',
+    'background: none sienna no-repeat 0 0;',
 'div.d' :
-    'background: none maroon no-repeat 0 0;',
+    'background: none salmon no-repeat 0 0;',
 'div.e' :
-    'background: none darkolivegreen no-repeat 0 0;',
+    'background: none firebrick no-repeat 0 0;',
 'div.f' :
-    'background: none midnightblue no-repeat 0 0;',
+    'background: none crimson no-repeat 0 0;',
 'div.g' :
-    'background: none darkorange no-repeat 0 0;',
+    'background: none indianred no-repeat 0 0;',
 'div.h' :
-    'background: none indigo no-repeat 0 0;',
+    'background: none lightcoral no-repeat 0 0;',
 'div.square' :
     'border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 0px; border-color: black; border-style: solid; width: 20px; height: 20px;',
+'div#message' :
+    'position:absolute; top:50%; left:50%; font-size:50px;' +
+    'width:400px; background-color: white; border: 2px solid black;' +
+    'margin-left: -200px; display: none;',
+'#message a' :
+    'text-decoration:none; color: red;'
 };
 //////////////////////////////////////////////////////////////////////
 // TODO: hide into Game class
@@ -185,11 +198,14 @@ function TetrisCssUI(html_root_element) {
     ulScore.setAttribute('id', 'ulScore');
     var liPoints = document.createElement('li');
     ulScore.appendChild(liPoints);
+    var ulHelp = document.createElement('ul');
+    ulHelp.setAttribute('id', 'ulHelp');
 
     td_left.appendChild(tblField);
     td_right.appendChild(tblBoard);
     td_right.appendChild(ulLevels);
     td_right.appendChild(ulScore);
+    td_right.appendChild(ulHelp);
     tr.appendChild(td_right);
     tr.appendChild(td_left);
     tblTetris.appendChild(tr);
@@ -243,6 +259,11 @@ function TetrisCssUI(html_root_element) {
         }
         this.board_rows = l.getElementsByTagName("tr");
         liPoints.innerHTML = "P: " + score['Points'];
+        for (var msg in HelpMessages) {
+            var li = document.createElement('li');
+            li.innerHTML = HelpMessages[msg];
+            ulHelp.appendChild(li);
+        }
     };
 
     this.draw_figure = function (M, F) {
@@ -400,6 +421,8 @@ function TetrisGame(html_root_element, w, h, ui) {
     }
 
     this.resume = function() {
+        if (this.running)
+            return;
         this.running = true;
         this.timer = setTimeout(function() { Tetris.run() }, this.timeout);
         this.figure.move_down();
@@ -553,7 +576,6 @@ function process_key(e) {
     function is_special(k) {
         return ((32==k) || (27==k) || (37==k) || (39==k)|| (40==k) || (38==k) || (13==k));
     }
-    //var Running = true;
     var e = window.event || e ;
     var Skip = (("keypress"== e.type) && ("keypress" != PrevEvent));
     if (is_special(e.keyCode) && (!Skip)) {

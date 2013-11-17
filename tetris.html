@@ -5,48 +5,7 @@
         <meta name="description" content="800, 640" />
         <title>::TETRIS::</title>
         <script type="text/javascript" src="tetris.js"></script>
-
-        <style type="text/css">
-			div#message {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                font-size: 50px;
-                width: 400px;
-                background-color: white;
-                border: 2px solid black;
-                margin-left: -200px;
-                display: none;
-			}
-            #message a {
-                text-decoration:none;
-                color: red;
-            }
-            .m {
-                background-color: #c0c0d0 ;
-            }
-            .n {
-                background-color: #c0D0d0 ;
-            }
-            .v {
-                background-color: #E0D0C0 ;
-            }
-            .x {
-                background-color: #D0F0D0 ;
-            }
-			body {
-                background-color: white; 
-			}
-			table#score-table td {
-				padding: 5px 5px 5px 10px;
-			}
-            #level-cell {
-                font-size: 50px;
-                font-weight: bold;
-            }
-        </style>
     </head>
-
     <body onload="javascript:init_game('js-tetris-root')"  onkeydown="javascript:process_key(event)" onkeypress="javascript:process_key(event)">
         <div align="center" id='container'>
     				<div id='message'><a href="#" onclick="init_game('js-tetris-root');return false" id='messagetext'>START</a></div>
