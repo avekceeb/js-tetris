@@ -25,7 +25,7 @@ var HelpMessages = [
 ];
 var Css = { 
 'table#tblTetris' :
-    'font-family: monospace,sans-serif; background:beige 0 ; font-size:small;',
+    'font-family: monospace,sans-serif; background:beige 0 ; font-size:small; padding:10px;',
 'table#tblField' :
     'border-top-width:1px; border-right-width:0px; border-bottom-width:0px; border-left-width:1px; border-color:black; border-style:solid;', 
 'ul#ulLevels':
@@ -33,14 +33,14 @@ var Css = {
 'li.current':
     'background:gainsboro;',
 'li.done' :
-    'text-decoration:line-through;',
+    'text-decoration:line-through; color: green;',
 'ul#ulScore' :
     'list-style: none; padding-left:0;',
 'ul#ulHelp' :
-    'list-style:none; padding-left:0; font-size:x-small;',
-'table#next-table' :
-    'border:0 none; padding:0; background:transparent 0 ;',
-'table#next-table td' :
+    'list-style:none; padding:0 5px 0 0; font-size:x-small;',
+'table#tblNext' :
+    'border:0 none; padding:0 0 0 10px; background:transparent 0;',
+'table#tblNext td' :
     'border:0 none; padding:0;',
 'div.square-next':
     'border:none 0; width:10px; height:10px;',
@@ -152,7 +152,7 @@ function getPageSize() {
     }
     return [myWidth, myHeight];
 }
-function setStyle(selector, property, value) {
+function setStyle(sheet, selector, property, value) {
     var cssRuleCode = document.all ? 'rules' : 'cssRules'; //account for IE and FF
     //TODO: iterate through sheets
     var rules = document.styleSheets[0][cssRuleCode];
@@ -161,6 +161,30 @@ function setStyle(selector, property, value) {
                 rules[i].style[property] = value;
         }
     }
+}
+
+function newNode(tag, attrs, parnt) {
+    // check tag string
+    var node = document.createElement(tag);
+    for (var atr in attrs) {
+        node.setAttribute(atr, attrs[atr]);
+    }
+    if (parnt) {
+        parnt.appendChild(node);
+    }
+    return node;
+}
+
+function getStyleSheet() {
+    console.log('Hi');
+    var sheets = document.styleSheets;
+    if (0 < sheets.length)
+        return sheets[0];
+    var sheet = document.createElement("style");
+    // TODO: style.setAttribute("media", "screen")
+    sheet.appendChild(document.createTextNode(""));
+    document.head.appendChild(sheet);
+    return sheets[0]; 
 }
 //////////////////////////////////////////////////////////////////////
 //////// UI class  ///////////////////////////////////////////////////
@@ -171,11 +195,13 @@ function TetrisCssUI(html_root_element) {
     h = getPageSize()[1];
     ch = Math.floor((h-70)/21);
 
+    var styles = getStyleSheet();
+
     for (var selector in Css) {
-        document.styleSheets[0].insertRule(selector + '{' + Css[selector] + '}', 0);
+        styles.insertRule(selector + '{' + Css[selector] + '}', 0);
     }
-    setStyle('div.square', 'width', ch + 'px');
-    setStyle('div.square', 'height', ch + 'px');
+    setStyle(styles, 'div.square', 'width', ch + 'px');
+    setStyle(styles, 'div.square', 'height', ch + 'px');
     this.levelRows = [];
     var root = document.getElementById(html_root_element);
     root.innerHTML='';
@@ -187,25 +213,25 @@ function TetrisCssUI(html_root_element) {
     tblField.setAttribute('cellpadding', '0');
     tblField.setAttribute('cellspacing', '0');
     tblField.setAttribute('id', 'tblField');
-    var tblBoard = document.createElement('table');
+    var tblNext = document.createElement('table');
     tblTetris.setAttribute('id', 'tblTetris');
-    tblBoard.setAttribute('cellpadding', '0');
-    tblBoard.setAttribute('cellspacing', '0');
-    tblBoard.setAttribute('id', 'tblBoard');
+    tblNext.setAttribute('cellpadding', '0');
+    tblNext.setAttribute('cellspacing', '0');
+    tblNext.setAttribute('id', 'tblNext');
     var ulLevels = document.createElement('ul');
     ulLevels.setAttribute('id', 'ulLevels');
     var ulScore = document.createElement('ul');
     ulScore.setAttribute('id', 'ulScore');
     var liPoints = document.createElement('li');
     ulScore.appendChild(liPoints);
-    var ulHelp = document.createElement('ul');
-    ulHelp.setAttribute('id', 'ulHelp');
-
+    //var ulHelp = document.createElement('ul');
+    //ulHelp.setAttribute('id', 'ulHelp');
     td_left.appendChild(tblField);
-    td_right.appendChild(tblBoard);
+    td_right.appendChild(tblNext);
     td_right.appendChild(ulLevels);
     td_right.appendChild(ulScore);
-    td_right.appendChild(ulHelp);
+    //td_right.appendChild(ulHelp);
+    var ulHelp = newNode('ul', {'id':'ulHelp'}, td_right);
     tr.appendChild(td_right);
     tr.appendChild(td_left);
     tblTetris.appendChild(tr);
@@ -234,7 +260,7 @@ function TetrisCssUI(html_root_element) {
     };
 
     this.create_board = function(score) {
-        var l = tblBoard;
+        var l = tblNext;
         while (l.firstChild)  l.removeChild(l.firstChild);
         for(var row=0; row<4; row++) {
             var r = document.createElement("tr");
