@@ -16,7 +16,7 @@
 
 //////////////////////////////////////////////////////////////////////
 var Tetris;
-var Styles = ["square back","square c","square d","square e","square f","square g","square h","square c","square d","square e","square f","square g","square h","square c","square d","square e","square f","square g","square h"];
+var Styles = ["square back","square c","square d","square e","square f","square g","square h","square b"];
 var HelpMessages = [
     'Enter - start',
     'Esc   - pause',
@@ -48,18 +48,20 @@ var Css = {
     'background-color:gray;',
 'div.square-next-back':
     'background-color: transparent;',
+'div.b' :
+    'background: none red no-repeat 0 0;',
 'div.c' :
-    'background: none sienna no-repeat 0 0;',
+    'background: none green no-repeat 0 0;',
 'div.d' :
-    'background: none salmon no-repeat 0 0;',
+    'background: none blue no-repeat 0 0;',
 'div.e' :
-    'background: none firebrick no-repeat 0 0;',
+    'background: none black no-repeat 0 0;',
 'div.f' :
-    'background: none crimson no-repeat 0 0;',
+    'background: none yellow no-repeat 0 0;',
 'div.g' :
-    'background: none indianred no-repeat 0 0;',
+    'background: none cyan no-repeat 0 0;',
 'div.h' :
-    'background: none lightcoral no-repeat 0 0;',
+    'background: none magenta no-repeat 0 0;',
 'div.square' :
     'border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 0px; border-color: black; border-style: solid; width: 20px; height: 20px;',
 'div#message' :
@@ -87,6 +89,22 @@ var L3 = [
     [0,0,0],
     [0,0,1],
     [1,1,1]];
+var J0 = [
+    [0,0,1],
+    [0,0,1],
+    [0,1,1]];
+var J1 = [
+    [0,0,0],
+    [1,0,0],
+    [1,1,1]];
+var J2 = [
+    [1,1,0],
+    [1,0,0],
+    [1,0,0]];
+var J3 = [
+    [1,1,1],
+    [0,0,1],
+    [0,0,0]];
 var T0 = [
     [1,0,0],
     [1,1,0],
@@ -127,13 +145,15 @@ var Q0 = [
     [1,1],
     [1,1]];
 var L = [L0,L1,L2,L3];
+var J = [J0,J1,J2,J3];
 var T = [T0,T1,T2,T3];
 var I = [I0,I1,I0,I1];
 var S = [S0,S1,S0,S1];
 var Q = [Q0,Q0,Q0,Q0];
 var Z = [Z0,Z1,Z0,Z1];
 
-P = [L,T,I,S,Q,Z];
+P = [L,T,I,S,Q,Z,J];
+//PC= ['b','c','d','e','f','g','h'];
 
 //////////////////////////////////////////////////////////////////////
 ////////  some helper functions  /////////////////////////////////////
@@ -334,13 +354,14 @@ function TetrisCssUI(html_root_element) {
 ////////  Figure class  //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 function Figure (game_, id) {
-
     var game = game_;
-
-    this.m = P[id || 0];
+    var z = id + 1;
+    console.log('[' + z + '] ' + Styles[z]);
+    this.m = P[id];
     this.orientation = 0;
     //TODO  Styles
-    this.color = Math.floor(Math.random()*Styles.length) || 1;
+    //this.color = Math.floor(Math.random()*Styles.length) || 1;
+    this.color = z;
     this.row = 0;
     // initial x-position : center
     this.cell = Math.floor(game.field[0].length/2);
