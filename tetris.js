@@ -30,9 +30,9 @@ var Css = {
     'border-top-width:1px; border-right-width:0px; border-bottom-width:0px; border-left-width:1px; border-color:black; border-style:solid;', 
 'ul#ulLevels':
     'list-style:none; padding-left:0;',
-'li.current':
-    'background:gainsboro;',
-'li.done' :
+'ul#ulLevels li':
+    'color:red;',
+'ul#ulLevels li.done' :
     'text-decoration:line-through; color: green;',
 'ul#ulScore' :
     'list-style: none; padding-left:0;',
@@ -204,38 +204,21 @@ function TetrisCssUI(html_root_element) {
     setStyle(styles, 'div.square', 'height', ch + 'px');
     this.levelRows = [];
     var root = document.getElementById(html_root_element);
-    root.innerHTML='';
-    var tblTetris = document.createElement('table');
-    var tr = document.createElement('tr');
-    var td_left = document.createElement('td');
-    var td_right = document.createElement('td');
-    var tblField = document.createElement('table');
-    tblField.setAttribute('cellpadding', '0');
-    tblField.setAttribute('cellspacing', '0');
-    tblField.setAttribute('id', 'tblField');
-    var tblNext = document.createElement('table');
-    tblTetris.setAttribute('id', 'tblTetris');
-    tblNext.setAttribute('cellpadding', '0');
-    tblNext.setAttribute('cellspacing', '0');
-    tblNext.setAttribute('id', 'tblNext');
-    var ulLevels = document.createElement('ul');
-    ulLevels.setAttribute('id', 'ulLevels');
-    var ulScore = document.createElement('ul');
-    ulScore.setAttribute('id', 'ulScore');
-    var liPoints = document.createElement('li');
-    ulScore.appendChild(liPoints);
-    //var ulHelp = document.createElement('ul');
-    //ulHelp.setAttribute('id', 'ulHelp');
-    td_left.appendChild(tblField);
-    td_right.appendChild(tblNext);
-    td_right.appendChild(ulLevels);
-    td_right.appendChild(ulScore);
-    //td_right.appendChild(ulHelp);
-    var ulHelp = newNode('ul', {'id':'ulHelp'}, td_right);
-    tr.appendChild(td_right);
-    tr.appendChild(td_left);
-    tblTetris.appendChild(tr);
-    root.appendChild(tblTetris);
+    root.innerHTML="<div id='message'><a href='#' onclick='init_game(\"" +
+        html_root_element + "\");return false;' id='messagetext'>START</a></div>";
+    var tblTetris = newNode('table',{'id':'tblTetris'},root);
+    var tr = newNode('tr',{},tblTetris);
+    var td_left = newNode('td',{},tr);
+    var td_right = newNode('td',{},tr);
+    var tblField = newNode('table', 
+        {'id':'tblField', 'cellpadding':'0','cellspacing':'0'},
+        td_right);
+    var tblNext = newNode('table',
+        {'cellpadding':'0','cellspacing':'0','id':'tblNext'},td_left);
+    var ulLevels = newNode('ul',{'id':'ulLevels'},td_left);
+    var ulScore = newNode('ul',{'id':'ulScore'},td_left);
+    var liPoints = newNode('li',{}, ulScore);
+    var ulHelp = newNode('ul', {'id':'ulHelp'}, td_left);
 
     this.field_rows = [];
     this.board_rows = [];
@@ -278,7 +261,6 @@ function TetrisCssUI(html_root_element) {
         var lvls = score['AllLevels'];
         for (var i=lvls.length-1; i>=0; i--) {
             var li = document.createElement('li');
-            //li.setAttribute('class', 'current done');
             li.innerHTML = i + ": " + lvls[i];
             ulLevels.appendChild(li);
             this.levelRows.push(li);
@@ -612,6 +594,6 @@ function process_key(e) {
 }
 
 function init_game(root_element) {
-    Tetris = new TetrisGame(root_element, 8, 20, TetrisCssUI);
+    Tetris = new TetrisGame(root_element, 10, 20, TetrisCssUI);
     Tetris.run();
 }
