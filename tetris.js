@@ -16,7 +16,6 @@
 
 //////////////////////////////////////////////////////////////////////
 var Tetris;
-var Styles = ["square back","square c","square d","square e","square f","square g","square h","square b"];
 var HelpMessages = [
     'Enter - start',
     'Esc   - pause',
@@ -48,20 +47,20 @@ var Css = {
     'background-color:gray;',
 'div.square-next-back':
     'background-color: transparent;',
-'div.b' :
+'div.L' :
     'background: none red no-repeat 0 0;',
-'div.c' :
+'div.T' :
     'background: none green no-repeat 0 0;',
-'div.d' :
+'div.S' :
     'background: none blue no-repeat 0 0;',
-'div.e' :
-    'background: none black no-repeat 0 0;',
-'div.f' :
-    'background: none yellow no-repeat 0 0;',
-'div.g' :
-    'background: none cyan no-repeat 0 0;',
-'div.h' :
-    'background: none magenta no-repeat 0 0;',
+'div.Z' :
+    'background: none darkorange no-repeat 0 0;',
+'div.Q' :
+    'background: none darkmagenta no-repeat 0 0;',
+'div.I' :
+    'background: none gold no-repeat 0 0;',
+'div.J' :
+    'background: none Turquoise no-repeat 0 0;',
 'div.square' :
     'border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 0px; border-color: black; border-style: solid; width: 20px; height: 20px;',
 'div#message' :
@@ -153,7 +152,8 @@ var Q = [Q0,Q0,Q0,Q0];
 var Z = [Z0,Z1,Z0,Z1];
 
 P = [L,T,I,S,Q,Z,J];
-//PC= ['b','c','d','e','f','g','h'];
+Pcounts = [0,0,0,0,0,0,0];
+var Styles = ["back","L","T","I","S","Q","Z","J"];
 
 //////////////////////////////////////////////////////////////////////
 ////////  some helper functions  /////////////////////////////////////
@@ -196,7 +196,6 @@ function newNode(tag, attrs, parnt) {
 }
 
 function getStyleSheet() {
-    console.log('Hi');
     var sheets = document.styleSheets;
     if (0 < sheets.length)
         return sheets[0];
@@ -253,7 +252,7 @@ function TetrisCssUI(html_root_element) {
             for (var cell=0; cell<M[0].length-1; cell++) {
                 var td = document.createElement("td");
                 var d = document.createElement("div");
-                d.setAttribute("class", Styles[M[row][cell]]);
+                d.setAttribute("class", "square " + Styles[M[row][cell]]);
                 td.appendChild(d);
                 r.appendChild(td);
             }
@@ -301,7 +300,7 @@ function TetrisCssUI(html_root_element) {
                     continue;
                 var fc = this.field_rows[F.row+r].cells[F.cell+c];
                 var fd = fc.getElementsByTagName("div");
-                fd[0].setAttribute("class",Styles[F.color*F.get_cell(r,c)]);
+                fd[0].setAttribute("class","square " + Styles[F.color*F.get_cell(r,c)]);
             }
         }
     }
@@ -321,7 +320,7 @@ function TetrisCssUI(html_root_element) {
                 var c = this.board_rows[row].cells[cell];
                 var d = c.getElementsByTagName("div");
                 style = ((row<f.length) && (cell<f[row].length)) ? f[row][cell] : 0; 
-                d[0].setAttribute("class", style ? "square-next square-next-fore" : "square-next square-next-back");
+                d[0].setAttribute("class", style ? "square-next " + Styles[fig_id+1] : "square-next square-next-back");
             }
         }
     }
@@ -331,7 +330,7 @@ function TetrisCssUI(html_root_element) {
             for (var cell=0; cell<M[0].length-1; cell++) {
                 var c = this.field_rows[row].cells[cell];
                 var d = c.getElementsByTagName("div");
-                d[0].setAttribute("class",Styles[M[row][cell]]);
+                d[0].setAttribute("class","square " + Styles[M[row][cell]]);
             }
         }
         this.draw_figure(M, F);
@@ -356,7 +355,6 @@ function TetrisCssUI(html_root_element) {
 function Figure (game_, id) {
     var game = game_;
     var z = id + 1;
-    console.log('[' + z + '] ' + Styles[z]);
     this.m = P[id];
     this.orientation = 0;
     //TODO  Styles
@@ -414,7 +412,7 @@ function Figure (game_, id) {
 function TetrisGame(html_root_element, w, h, ui) {
 
     function get_bonus_points(lines) {
-        return lines;
+        //return lines;
         switch (lines) {
             case 0: return 0;
             case 1: return 1;
@@ -424,15 +422,15 @@ function TetrisGame(html_root_element, w, h, ui) {
             default: return 0;
         }
     }
-    //this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
-    this.levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10];
+    this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
+    //this.levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10];
     this.timer = null;
     this.timeout = 1200;
     this.running = false;
     this.score = {'Lines':0,'Pieces':0,'Points':0,'Level':0,'Next':this.levels.shift(), 'AllLevels':this.levels};
     this.width = w || 10;
     this.height = h || 20;
-    this.next_figure_id = Math.floor(Math.random()*P.length);
+    this.next_figure_id = Math.floor((Math.random()*1000)%P.length);
 
     /***  timer ***/
     // TODO: timeout function = member, so Global name of instance used ('Tetris')
@@ -539,7 +537,9 @@ function TetrisGame(html_root_element, w, h, ui) {
             this.UI.game_over();
             return;
         }
-        this.next_figure_id = Math.floor(Math.random()*P.length);
+        this.next_figure_id = Math.floor((Math.random()*1000)%P.length);
+        //Pcounts[this.next_figure_id]++;
+        //console.log(Pcounts.toString());
     }
 
     this.check_move = function(fig, dX, dY, dO) {
