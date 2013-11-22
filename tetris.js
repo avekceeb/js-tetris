@@ -1,18 +1,28 @@
-//  [
-//    [*,0,0],
-//    [1,0,0],
-//    [1,1,0]
-//  ];
-//       * - is coordinate of the figure
-//       0 - means that field is empty
-//       >0 - means occupied field
+/*
+Tetris Game http://en.wikipedia.org/wiki/Tetris
+implementation by Dmitry Alexeev
 
-//      *---------> x
-//      |
-//      |
-//      |
-//    y V
+Works at least in:
+Firefox 24.0
+Opera 12.16 
+Chromium 29.0
 
+    [
+      [*,0,0],
+      [1,0,0],
+      [1,1,0]
+    ];
+         * - is coordinate of the figure
+         0 - means that field is empty
+         >0 - means occupied field
+
+        *---------> x
+        |
+        |
+        |
+      y V
+
+*/
 
 //////////////////////////////////////////////////////////////////////
 var Tetris;
@@ -25,18 +35,46 @@ var HelpMessages = [
 var Css = { 
 'table#tblTetris' :
     'font-family: monospace,sans-serif; background:beige 0 ; font-size:small; padding:10px;',
+
 'table#tblField' :
-    'border-top-width:1px; border-right-width:0px; border-bottom-width:0px; border-left-width:1px; border-color:black; border-style:solid;', 
+    'border-width:1px 0 0 1px; border-color:black; border-style:dotted;', 
+
+'table#tblField td' :
+    'border-width:0 1px 1px 0; border-color:black; border-style:dotted;', 
+
+'div.back' :
+    'background:none beige no-repeat 0 0; border-color:beige; border-width:3px; border-style:solid;',
+'div.L' :
+    'background:none red no-repeat 0 0; border-color:red; border-width:3px; border-style:outset;',
+'div.T' :
+    'background: none green no-repeat 0 0; border-color:green; border-width:3px; border-style:outset;',
+'div.S' :
+    'background: none blue no-repeat 0 0; border-color:blue; border-width:3px; border-style:outset;',
+'div.Z' :
+    'background: none darkorange no-repeat 0 0; border-color:darkorange; border-width:3px; border-style:outset;',
+'div.Q' :
+    'background: none darkmagenta no-repeat 0 0; border-color:darkmagenta; border-width:3px; border-style:outset;',
+'div.I' :
+    'background: none gold no-repeat 0 0; border-color:gold; border-width:3px; border-style:outset;',
+'div.J' :
+    'background: none Turquoise no-repeat 0 0; border-color:turquoise; border-width:3px; border-style:outset;',
+
+'div.square' :
+    'width: 20px; height: 20px;',
+
 'ul#ulLevels':
     'list-style:none; padding-left:0;',
 'ul#ulLevels li':
     'color:red;',
 'ul#ulLevels li.done' :
     'text-decoration:line-through; color: green;',
+
 'ul#ulScore' :
     'list-style: none; padding-left:0;',
+
 'ul#ulHelp' :
     'list-style:none; padding:0 5px 0 0; font-size:x-small;',
+
 'table#tblNext' :
     'border:0 none; padding:0 0 0 10px; background:transparent 0;',
 'table#tblNext td' :
@@ -47,22 +85,7 @@ var Css = {
     'background-color:gray;',
 'div.square-next-back':
     'background-color: transparent;',
-'div.L' :
-    'background: none red no-repeat 0 0;',
-'div.T' :
-    'background: none green no-repeat 0 0;',
-'div.S' :
-    'background: none blue no-repeat 0 0;',
-'div.Z' :
-    'background: none darkorange no-repeat 0 0;',
-'div.Q' :
-    'background: none darkmagenta no-repeat 0 0;',
-'div.I' :
-    'background: none gold no-repeat 0 0;',
-'div.J' :
-    'background: none Turquoise no-repeat 0 0;',
-'div.square' :
-    'border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 0px; border-color: black; border-style: solid; width: 20px; height: 20px;',
+
 'div#message' :
     'position:absolute; top:50%; left:50%; font-size:50px;' +
     'width:400px; background-color: white; border: 2px solid black;' +
@@ -70,6 +93,27 @@ var Css = {
 '#message a' :
     'text-decoration:none; color: red;'
 };
+/*
+var FlatCss = {
+'div.back' :
+    'background:none beige no-repeat 0 0; border-color:beige; border-width:3px; border-style:solid;',
+'div.L' :
+    'background:none red no-repeat 0 0; border-color:firebrick; border-width:3px; border-style:solid;',
+'div.T' :
+    'background: none green no-repeat 0 0; border-color:darkgreen; border-width:3px; border-style:solid;',
+'div.S' :
+    'background: none blue no-repeat 0 0; border-color:mediumblue; border-width:3px; border-style:solid;',
+'div.Z' :
+    'background: none darkorange no-repeat 0 0; border-color:chocolate; border-width:3px; border-style:solid;',
+'div.Q' :
+    'background: none darkmagenta no-repeat 0 0; border-color:indigo; border-width:3px; border-style:solid;',
+'div.I' :
+    'background: none gold no-repeat 0 0; border-color:sienna; border-width:3px; border-style:solid;',
+'div.J' :
+    'background: none Turquoise no-repeat 0 0; border-color:darkcyan; border-width:3px; border-style:solid;',
+};
+*/
+
 //////////////////////////////////////////////////////////////////////
 // TODO: hide into Game class
 var L0 = [
@@ -211,8 +255,10 @@ function getStyleSheet() {
 
 function TetrisCssUI(html_root_element) {
     // TODO: sizes of root element
+    // TODO: calculate size of field cell by min of width and height
+    // TODO: get dimensions of game field (10x20 - default)
     h = getPageSize()[1];
-    ch = Math.floor((h-70)/21);
+    ch = Math.floor(h/21-3*2-1);
 
     var styles = getStyleSheet();
 
@@ -412,17 +458,16 @@ function Figure (game_, id) {
 function TetrisGame(html_root_element, w, h, ui) {
 
     function get_bonus_points(lines) {
-        //return lines;
         switch (lines) {
             case 0: return 0;
             case 1: return 1;
-            case 2: return 5;
-            case 3: return 10;
-            case 4: return 25;
+            case 2: return 2 + 8;
+            case 3: return 3 + 32;
+            case 4: return 4 + 64;
             default: return 0;
         }
     }
-    this.levels = [1, 2, 6, 10, 15, 25, 50, 100, 200];
+    this.levels = [0, 2, 16, 32, 64, 128, 256, 1024];
     //this.levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10];
     this.timer = null;
     this.timeout = 1200;
@@ -503,8 +548,8 @@ function TetrisGame(html_root_element, w, h, ui) {
             this.score['Next'] = this.levels.shift();
             this.score['Level']++;
             this.timeout *= 0.85;
-            this.UI.update_score(this.score);
         }
+        this.UI.update_score(this.score);
     }
 
     this.is_full = function(line) {
