@@ -6,6 +6,9 @@ Works at least in:
 Firefox 24.0
 Opera 12.16 
 Chromium 29.0
+Safari 5.1.7
+
+DOESNT WORK in IE (yet)
 
     [
       [*,0,0],
