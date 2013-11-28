@@ -2,13 +2,16 @@
 Tetris Game http://en.wikipedia.org/wiki/Tetris
 implementation by Dmitry Alexeev
 
+https://github.com/avekceeb/js-tetris.git
+
 Works at least in:
 Firefox 24.0
 Opera 12.16 
 Chromium 29.0
 Safari 5.1.7
+IE>=8
 
-DOESNT WORK in IE (yet)
+TODO: lost focus after start|end
 
     [
       [*,0,0],
@@ -248,8 +251,10 @@ function getStyleSheet() {
         return sheets[0];
     var sheet = document.createElement("style");
     // TODO: style.setAttribute("media", "screen")
-    sheet.appendChild(document.createTextNode(""));
-    document.head.appendChild(sheet);
+    if (navigator.appName != 'Microsoft Internet Explorer')
+        sheet.appendChild(document.createTextNode(""));
+    document.getElementsByTagName("head")[0].appendChild(sheet);
+    //Does not work in IE8:document.head.appendChild(sheet);
     return sheets[0]; 
 }
 //////////////////////////////////////////////////////////////////////
@@ -261,12 +266,16 @@ function TetrisCssUI(html_root_element) {
     // TODO: calculate size of field cell by min of width and height
     // TODO: get dimensions of game field (10x20 - default)
     h = getPageSize()[1];
-    ch = Math.floor(h/21-3*2-1);
+    ch = Math.floor((h-50)/21-3*2-1);
 
     var styles = getStyleSheet();
 
     for (var selector in Css) {
-        styles.insertRule(selector + '{' + Css[selector] + '}', 0);
+        if (styles.insertRule) {
+            styles.insertRule(selector + '{' + Css[selector] + '}', 0);
+        } else if ( styles.addRule ) { // IE<9
+            styles.addRule(selector, Css[selector], -1);
+        }
     }
     setStyle(styles, 'div.square', 'width', ch + 'px');
     setStyle(styles, 'div.square', 'height', ch + 'px');
